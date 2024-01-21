@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "261060905169",
+    "project_id": "khetiharii-600bf",
+    "storage_bucket": "khetiharii-600bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261060905169:android:3738ad8e8f9a35c8325df0",
+        "android_client_info": {
+          "package_name": "com.example.khetiharii"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCW6PDkS6xEIghLvNKc6cOSr-u8OOQSI9E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
