@@ -1,40 +1,92 @@
 import 'package:flutter/material.dart';
 
+@immutable
+class ShopItem {
+  const ShopItem({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.imagePath,
+    required this.color,
+    this.unit = 'unit',
+  });
+
+  final String id;
+  final String name;
+  final double price;
+  final String imagePath;
+  final Color color;
+  final String unit;
+}
+
 class CartModel extends ChangeNotifier {
-  // list of items on sale
-  final List _shopItems = const [
-    // [ itemName, itemPrice, imagePath, color ]
-    ["Avocado", "4.00", "assets/images/doctor.jpeg", Colors.green],
-    ["Banana", "2.50", "assets/images/ferti.jpeg", Colors.yellow],
-    ["Chicken", "12.80", "assets/images/owner.jpeg", Colors.brown],
-    ["Water", "1.00", "assets/images/seller.jpeg", Colors.blue],
+  // Temporary local catalogue. Replace this with Firestore-backed products
+  // when the marketplace repository is introduced.
+  final List<ShopItem> _shopItems = const [
+    ShopItem(
+      id: 'seed-wheat',
+      name: 'Wheat seeds',
+      price: 420.0,
+      imagePath: 'assets/images/ferti.jpeg',
+      color: Colors.green,
+      unit: '5 kg pack',
+    ),
+    ShopItem(
+      id: 'seed-mustard',
+      name: 'Mustard seeds',
+      price: 260.0,
+      imagePath: 'assets/images/doctor.jpeg',
+      color: Colors.orange,
+      unit: '2 kg pack',
+    ),
+    ShopItem(
+      id: 'tool-sprayer',
+      name: 'Hand sprayer',
+      price: 850.0,
+      imagePath: 'assets/images/owner.jpeg',
+      color: Colors.blue,
+      unit: 'piece',
+    ),
+    ShopItem(
+      id: 'fertilizer-organic',
+      name: 'Organic manure',
+      price: 180.0,
+      imagePath: 'assets/images/seller.png',
+      color: Colors.brown,
+      unit: '10 kg bag',
+    ),
   ];
 
-  // list of cart items
-  List _cartItems = [];
+  final List<ShopItem> _cartItems = [];
 
-  get cartItems => _cartItems;
+  List<ShopItem> get shopItems => List.unmodifiable(_shopItems);
+  List<ShopItem> get cartItems => List.unmodifiable(_cartItems);
 
-  get shopItems => _shopItems;
+  double get totalPrice =>
+      _cartItems.fold(0.0, (total, item) => total + item.price);
 
-  // add item to cart
   void addItemToCart(int index) {
+    if (index < 0 || index >= _shopItems.length) {
+      throw RangeError.index(index, _shopItems, 'index');
+    }
     _cartItems.add(_shopItems[index]);
     notifyListeners();
   }
 
-  // remove item from cart
   void removeItemFromCart(int index) {
+    if (index < 0 || index >= _cartItems.length) {
+      throw RangeError.index(index, _cartItems, 'index');
+    }
     _cartItems.removeAt(index);
     notifyListeners();
   }
 
-  // calculate total price
-  String calculateTotal() {
-    double totalPrice = 0;
-    for (int i = 0; i < cartItems.length; i++) {
-      totalPrice += double.parse(cartItems[i][1]);
-    }
-    return totalPrice.toStringAsFixed(2);
+  void clearCart() {
+    if (_cartItems.isEmpty) return;
+    _cartItems.clear();
+    notifyListeners();
   }
+
+  // Kept for compatibility with the existing cart UI.
+  String calculateTotal() => totalPrice.toStringAsFixed(2);
 }
