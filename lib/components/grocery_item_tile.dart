@@ -1,15 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class GroceryItemTile extends StatelessWidget {
-  final String itemName;
-  final String itemPrice;
-  final String imagePath;
-  final color;
-  void Function()? onPressed;
-
-  GroceryItemTile({
+  const GroceryItemTile({
     super.key,
     required this.itemName,
     required this.itemPrice,
@@ -18,47 +10,66 @@ class GroceryItemTile extends StatelessWidget {
     required this.onPressed,
   });
 
+  final String itemName;
+  final String itemPrice;
+  final String imagePath;
+  final Color color;
+  final VoidCallback onPressed;
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: color[100],
-        ),
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      elevation: 1,
+      color: color.withOpacity(0.09),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // item image
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
-              child: Image.asset(
-                imagePath,
-                height: 64,
-              ),
-            ),
-
-            // item name
-            Text(
-              itemName,
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-
-            MaterialButton(
-              onPressed: onPressed,
-              color: color,
-              child: Text(
-                '\$' + itemPrice,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.agriculture_outlined,
+                    size: 54,
+                    color: color,
+                  ),
                 ),
               ),
-            )
+            ),
+            const SizedBox(height: 10),
+            Text(
+              itemName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '₹$itemPrice',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.green.shade900,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+                IconButton.filled(
+                  tooltip: 'Add $itemName to cart',
+                  onPressed: onPressed,
+                  icon: const Icon(Icons.add),
+                ),
+              ],
+            ),
           ],
         ),
       ),
