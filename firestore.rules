@@ -25,6 +25,7 @@ service cloud.firestore {
       allow read: if signedIn();
       allow create: if signedIn()
         && request.resource.data.farmerId == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'farmer'
         && request.resource.data.status == 'active'
         && request.resource.data.quantity is number
         && request.resource.data.quantity > 0
@@ -39,7 +40,9 @@ service cloud.firestore {
     match /marketplace_orders/{orderId} {
       allow create: if signedIn()
         && request.resource.data.buyerId == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'buyer'
         && request.resource.data.farmerId is string
+        && request.resource.data.buyerId != request.resource.data.farmerId
         && request.resource.data.quantity is number
         && request.resource.data.quantity > 0
         && request.resource.data.status == 'requested'
