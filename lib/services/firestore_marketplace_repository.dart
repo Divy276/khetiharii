@@ -12,16 +12,14 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
 
   @override
   Stream<List<CropListing>> watchActiveListings({String? search}) {
+    final term = search?.trim().toLowerCase() ?? '';
     Query<Map<String, dynamic>> query = _db
         .collection('crop_listings')
-        .where('status', isEqualTo: ListingStatus.active.name)
-        .orderBy('createdAt', descending: true)
-        .limit(50);
-    final term = search?.trim().toLowerCase() ?? '';
-    if (term.isNotEmpty) {
-      query = _db
-          .collection('crop_listings')
-          .where('status', isEqualTo: ListingStatus.active.name)
+        .where('status', isEqualTo: ListingStatus.active.name);
+    if (term.isEmpty) {
+      query = query.orderBy('createdAt', descending: true).limit(50);
+    } else {
+      query = query
           .orderBy('cropNameLower')
           .startAt([term])
           .endAt(['$term\uf8ff'])
@@ -45,6 +43,9 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
     required String buyerId,
     required double quantity,
   }) async {
+    if (buyerId == listing.farmerId) {
+      throw ArgumentError('Farmers cannot order their own listings.');
+    }
     if (quantity <= 0 || quantity > listing.quantity) {
       throw ArgumentError('Enter a quantity available in this listing.');
     }
@@ -60,20 +61,17 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
       transaction.set(order, {
         'listingId': listing.id,
         'buyerId': buyerId,
-        'farmerId': listing.farmerId,
-        'cropName': listing.cropName,
+        'farmerId': current.farmerId,
+        'cropName': current.cropName,
         'quantity': quantity,
-        'unit': listing.unit,
-        'unitPrice': listing.pricePerUnit,
-        'totalPrice': quantity * listing.pricePerUnit,
+        'unit': current.unit,
+        'unitPrice': current.pricePerUnit,
+        'totalPrice': quantity * current.pricePerUnit,
         'status': OrderStatus.requested.name,
         'createdAt': FieldValue.serverTimestamp(),
       });
-      final remaining = current.quantity - quantity;
-      transaction.update(listingRef, {
-        'quantity': remaining,
-        if (remaining == 0) 'status': ListingStatus.reserved.name,
-      });
+      // Inventory reservation must be implemented in a trusted Cloud Function.
+      // This client never decrements stock or decides the final reservation.
     });
   }
 
@@ -81,6 +79,16 @@ class FirestoreMarketplaceRepository implements MarketplaceRepository {
   Stream<List<MarketplaceOrder>> watchOrdersForUser(String uid) =>
       _db.collection('marketplace_orders')
           .where('buyerId', isEqualTo: uid)
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map((doc) => MarketplaceOrder.fromMap(doc.id, doc.data()))
+              .toList(growable: false));
+
+  @override
+  Stream<List<MarketplaceOrder>> watchOrdersForFarmer(String uid) =>
+      _db.collection('marketplace_orders')
+          .where('farmerId', isEqualTo: uid)
           .orderBy('createdAt', descending: true)
           .snapshots()
           .map((snapshot) => snapshot.docs
