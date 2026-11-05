@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../models/crop_listing.dart';
 import '../services/auth_service.dart';
-import '../services/firestore_marketplace_repository.dart';\nimport 'my_orders_screen.dart';
+import '../services/firestore_marketplace_repository.dart';
+import 'my_orders_screen.dart';
 import 'create_listing_screen.dart';
 
 class MarketplaceHomeScreen extends StatefulWidget {
@@ -77,7 +78,8 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
       appBar: AppBar(
         title: const Text('Khetiharii Market'),
         actions: [
-          IconButton(tooltip: 'My orders', onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MyOrdersScreen(role: _role))), icon: const Icon(Icons.receipt_long)),\n          IconButton(tooltip: 'Sign out', onPressed: () => AuthService().signOut(), icon: const Icon(Icons.logout)),
+          IconButton(tooltip: 'My orders', onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MyOrdersScreen(role: _role))), icon: const Icon(Icons.receipt_long)),
+          IconButton(tooltip: 'Sign out', onPressed: () => AuthService().signOut(), icon: const Icon(Icons.logout)),
         ],
       ),
       floatingActionButton: _role == 'farmer' ? FloatingActionButton.extended(
