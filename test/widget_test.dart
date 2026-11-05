@@ -5,7 +5,6 @@ void main() {
   group('CartModel', () {
     test('starts with an empty cart and a catalogue', () {
       final cart = CartModel();
-
       expect(cart.cartItems, isEmpty);
       expect(cart.shopItems, isNotEmpty);
       expect(cart.totalPrice, 0);
@@ -25,7 +24,6 @@ void main() {
 
     test('removes an item and resets the total', () {
       final cart = CartModel()..addItemToCart(0);
-
       cart.removeItemFromCart(0);
 
       expect(cart.cartItems, isEmpty);
@@ -36,7 +34,6 @@ void main() {
       final cart = CartModel()
         ..addItemToCart(0)
         ..addItemToCart(1);
-
       cart.clearCart();
 
       expect(cart.cartItems, isEmpty);
@@ -45,7 +42,6 @@ void main() {
 
     test('rejects an invalid catalogue index', () {
       final cart = CartModel();
-
       expect(() => cart.addItemToCart(100), throwsRangeError);
     });
   });
