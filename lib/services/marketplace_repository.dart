@@ -9,7 +9,7 @@ abstract interface class MarketplaceRepository {
     required String buyerId,
     required double quantity,
   });
-  Stream<List<MarketplaceOrder>> watchOrdersForUser(String uid);
+  Stream<List<MarketplaceOrder>> watchOrdersForUser(String uid);\n  Stream<List<MarketplaceOrder>> watchOrdersForFarmer(String uid);
   Future<void> updateOrderStatus({
     required String orderId,
     required String farmerId,
